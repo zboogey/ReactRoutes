@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import useFetch from '../hooks/useFetch'
-import { getProducts } from '../services/service'
+import { useProducts } from '../hooks/useProducts'
 import Card from '../components/Card'
 import Status from '../components/Status'
 
@@ -9,7 +8,8 @@ const PER_PAGE = 12
 
 export default function Products() {
   const [params, setParams] = useSearchParams()
-  const { data, loading, error } = useFetch(getProducts, [])
+  const { data, isPending: loading, error: queryError } = useProducts()
+  const error = queryError?.message
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''

@@ -84,3 +84,8 @@ dt { color: var(--muted); }
   .nav-inner { flex-direction: column; height: auto; padding: 12px 16px; align-items: flex-start; gap: 8px; }
   .nav nav { width: 100%; }
 }
+
+.nav nav .link { background: none; border: 0; padding: 0; font: inherit; font-size: 14px; color: var(--muted); cursor: pointer; }
+.form-error { color: #c00; font-size: 14px; }
+.login .muted { margin-top: 16px; }
+.login .muted a { text-decoration: underline; }

@@ -1,17 +1,16 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import useFetch from '../hooks/useFetch'
-import { getProductById } from '../services/service'
+import { useDeleteProduct, useProduct } from '../hooks/useProducts'
 import Status from '../components/Status'
 
 export default function ProductDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const validId = /^\d+$/.test(id)
+  const { data: p, isPending: loading, error: queryError } = useProduct(id)
+  const error = queryError?.message
+  const remove = useDeleteProduct()
 
-  const { data: p, loading, error } = useFetch(
-    (signal) => (validId ? getProductById(id, signal) : Promise.reject(new Error('NOT_FOUND'))),
-    [id]
-  )
+  const handleDelete = () =>
+    remove.mutate(id, { onSuccess: () => navigate('/products') })
 
   const links = (
     <div className="actions">
@@ -57,6 +56,12 @@ export default function ProductDetails() {
               <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
             ))}
           </dl>
+          <div className="actions">
+            <button className="btn ghost" onClick={handleDelete} disabled={remove.isPending}>
+              {remove.isPending ? 'Deleting…' : 'Delete product'}
+            </button>
+          </div>
+          {remove.error && <Status error>Error: {remove.error.message}</Status>}
         </div>
       </div>
     </section>

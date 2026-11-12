@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import useFetch from '../hooks/useFetch'
-import { getProducts } from '../services/service'
+import { useProducts } from '../hooks/useProducts'
 import Status from '../components/Status'
 
 const countBy = (list, key) =>
@@ -25,7 +24,8 @@ function Breakdown({ title, rows, total, link }) {
 }
 
 export default function Dashboard() {
-  const { data, loading, error } = useFetch(getProducts, [])
+  const { data, isPending: loading, error: queryError } = useProducts()
+  const error = queryError?.message
   const [category, setCategory] = useState('')
 
   const categories = useMemo(() => [...new Set((data || []).map((p) => p.category))], [data])

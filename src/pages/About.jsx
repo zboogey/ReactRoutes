@@ -12,6 +12,8 @@ export default function About() {
         <li>Dynamic product pages with <code>useParams</code></li>
         <li>Dashboard with statistics calculated from API data</li>
         <li>Lazy-loaded pages with <code>React.lazy</code> and <code>Suspense</code></li>
+        <li>Firebase Authentication (email/password and Google)</li>
+        <li>Server data caching with TanStack Query</li>
       </ul>
     </section>
   )
