@@ -2,7 +2,7 @@
 
 React shop built with React Router, TanStack Query, Firebase Auth and the [DummyJSON](https://dummyjson.com) products API.
 
-Live demo: _add deployed link here_
+Live demo: https://reactroutes-seven.vercel.app
 
 ## Setup
 ```bash
