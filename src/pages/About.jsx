@@ -14,6 +14,7 @@ export default function About() {
         <li>Lazy-loaded pages with <code>React.lazy</code> and <code>Suspense</code></li>
         <li>Firebase Authentication (email/password and Google)</li>
         <li>Server data caching with TanStack Query</li>
+        <li>Installable PWA with a service worker: works offline, notifies about updates</li>
       </ul>
     </section>
   )

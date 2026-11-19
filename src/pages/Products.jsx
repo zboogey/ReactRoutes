@@ -3,13 +3,16 @@ import { useSearchParams } from 'react-router-dom'
 import { useProducts } from '../hooks/useProducts'
 import Card from '../components/Card'
 import Status from '../components/Status'
+import CachedNotice from '../components/CachedNotice'
+import OfflineScreen from '../components/OfflineScreen'
 
 const PER_PAGE = 12
 
 export default function Products() {
   const [params, setParams] = useSearchParams()
-  const { data, isPending: loading, error: queryError } = useProducts()
-  const error = queryError?.message
+  const { data, cachedAt, isPending: loading, error: queryError, refetch } = useProducts()
+  // keep showing loaded data if only a background refetch failed
+  const error = data ? null : queryError?.message
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''
@@ -93,11 +96,13 @@ export default function Products() {
       </div>
 
       {loading && <Status>Loading products…</Status>}
-      {error && <Status error>Error: {error}</Status>}
+      {error === 'OFFLINE' && <OfflineScreen title="Products aren't available offline yet" onReconnect={refetch} />}
+      {error && error !== 'OFFLINE' && <Status error>Error: {error}</Status>}
       {!loading && !error && filtered.length === 0 && <Status>No products found.</Status>}
 
       {!loading && !error && filtered.length > 0 && (
         <>
+          <CachedNotice cachedAt={cachedAt} />
           <p className="muted">{filtered.length} products</p>
           <div className="grid">
             {visible.map((p) => <Card key={p.id} product={p} />)}

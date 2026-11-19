@@ -6,20 +6,30 @@ export const productKeys = {
   detail: (id) => ['products', id],
 }
 
+// data = product array, cachedAt = timestamp if the response came from the service worker cache
 export function useProducts() {
-  return useQuery({
+  const query = useQuery({
     queryKey: productKeys.all,
     queryFn: ({ signal }) => getProducts(signal),
   })
+  return { ...query, data: query.data?.items, cachedAt: query.data?.cachedAt }
 }
 
 export function useProduct(id) {
+  const queryClient = useQueryClient()
   const validId = /^\d+$/.test(id)
-  return useQuery({
+  const query = useQuery({
     queryKey: productKeys.detail(id),
     queryFn: ({ signal }) => (validId ? getProductById(id, signal) : Promise.reject(new Error('NOT_FOUND'))),
-    retry: (count, err) => err.message !== 'NOT_FOUND' && count < 2,
+    // The list already contains full product objects: show the item instantly (and offline) from it
+    initialData: () => {
+      const list = queryClient.getQueryData(productKeys.all)
+      const item = list?.items.find((p) => String(p.id) === id)
+      return item ? { item, cachedAt: list.cachedAt } : undefined
+    },
+    initialDataUpdatedAt: () => queryClient.getQueryState(productKeys.all)?.dataUpdatedAt,
   })
+  return { ...query, data: query.data?.item, cachedAt: query.data?.cachedAt }
 }
 
 export function useDeleteProduct() {

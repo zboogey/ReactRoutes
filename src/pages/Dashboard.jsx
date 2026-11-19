@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../hooks/useProducts'
 import Status from '../components/Status'
+import CachedNotice from '../components/CachedNotice'
+import OfflineScreen from '../components/OfflineScreen'
 
 const countBy = (list, key) =>
   Object.entries(
@@ -24,8 +26,9 @@ function Breakdown({ title, rows, total, link }) {
 }
 
 export default function Dashboard() {
-  const { data, isPending: loading, error: queryError } = useProducts()
-  const error = queryError?.message
+  const { data, cachedAt, isPending: loading, error: queryError, refetch } = useProducts()
+  // keep showing loaded data if only a background refetch failed
+  const error = data ? null : queryError?.message
   const [category, setCategory] = useState('')
 
   const categories = useMemo(() => [...new Set((data || []).map((p) => p.category))], [data])
@@ -35,6 +38,7 @@ export default function Dashboard() {
   )
 
   if (loading) return <Status>Loading dashboard…</Status>
+  if (error === 'OFFLINE') return <OfflineScreen title="Dashboard isn't available offline yet" onReconnect={refetch} />
   if (error) return <Status error>Error: {error}</Status>
 
   const avg = (key) => (list.reduce((s, p) => s + p[key], 0) / (list.length || 1)).toFixed(2)
@@ -55,6 +59,8 @@ export default function Dashboard() {
           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
+
+      <CachedNotice cachedAt={cachedAt} />
 
       <div className="stats">
         {stats.map(([label, value]) => (
